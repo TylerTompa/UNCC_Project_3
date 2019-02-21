@@ -20,7 +20,7 @@ def index():
 def predict():
     age = float(request.args.get("age")) or 0
     average_glucose_level = float(request.args.get("agl")) or 0
-    bmi = float(request.args.get("bmi")) or 0
+    # bmi = float(request.args.get("bmi")) or 0
 
     # We one-hot-encoded the categorical columns
     # Therefore we create a mapper for each of these features,
@@ -32,11 +32,21 @@ def predict():
     }
     work_type = request.args.get("work_type")
 
+    # In our initial data analysis we noticed that,
+    # the smoking_status data does not reflect statements made in a scientific journal
+    # on the effects of smoking on having a stroke
+    # We therefore opted not to use smoking_status as a feature
+    # We leave it commented it out here,
+    # so that we may return at a later time if we decide to use this in some way
     smoking_status_mapper = {
-        "formerly_smoked": [1, 0, 0],
+        "formerly_smoked": [0, 0, 1],
         "never_smoked": [0, 1, 0],
-        "smokes": [0, 0, 1]
+        "smokes": [1, 0, 0]
     }
+    # smoking_status_mapper = {
+    #     "currently_smokes": [1, 0],
+    #     "doesnt_currently_smoke": [0, 1]
+    # }
     smoking_status = request.args.get("smoking_status")
 
     hypertension_mapper = {
@@ -73,9 +83,16 @@ def predict():
     # We one-hot-encoded the categorical columns,
     # so we must use a mapper to pass the user's single input
     # to each relevant column
+
+    # In our initial data analysis we noticed that,
+    # the smoking_status data does not reflect statements made in a scientific journal
+    # on the effects of smoking on having a stroke
+    # We therefore opted not to use smoking_status as a feature
+    # We leave it commented it out here,
+    # so that we may return at a later time if we decide to use this in some way
     features = [[age,
                  average_glucose_level,
-                 bmi,
+                #  bmi,
                  work_type_mapper[work_type][0],
                  work_type_mapper[work_type][1],
                  work_type_mapper[work_type][2],
@@ -109,4 +126,3 @@ def predict():
 # Run Flask app
 if __name__ == "__main__":
     app.run(debug=True)
-
