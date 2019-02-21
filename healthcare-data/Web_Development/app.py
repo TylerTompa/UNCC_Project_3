@@ -4,25 +4,31 @@ from sklearn.externals import joblib
 # Load classifer
 classifier = joblib.load("stroke_predictor.model")
 
-# Create standard scaler
+# Load standard scaler
 standard_scaler = joblib.load("standard_scaler.model")
 
+# Define Flask app
 app = Flask(__name__)
 
+# Define index
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# Create API endpoint based on HTML form
 @app.route("/api/predict")
 def predict():
     age = float(request.args.get("age")) or 0
     average_glucose_level = float(request.args.get("agl")) or 0
     bmi = float(request.args.get("bmi")) or 0
 
+    # We one-hot-encoded the categorical columns
+    # Therefore we create a mapper for each of these features,
+    #  to "convert" the users input to the correct format
     work_type_mapper = {
         "self_employed": [1,0,0],
         "children": [0,1,0],
-        "other": [0,0,1]
+        "employer_employed": [0,0,1]
     }
     work_type = request.args.get("work_type")
 
@@ -33,34 +39,40 @@ def predict():
     }
     smoking_status = request.args.get("smoking_status")
 
-    # hypertension = int(request.args.get("hypertension")) or 0
-    # heart_disease = int(request.args.get("heart_disease")) or 0
-    # ever_married = int(request.args.get("ever_married")) or 0
-
     hypertension_mapper = {
         0: [1, 0],
         1: [0, 1]
     }
     hypertension = request.args.get("hypertension") or 0
-    if hypertension == "1":
+    if hypertension:
         hypertension = 1
-
+    else:
+        hypertension = 0
+    
     heart_disease_mapper = {
         0: [1, 0],
         1: [0, 1]
     }
     heart_disease = request.args.get("heart_disease") or 0
-    if heart_disease == "1":
+    if heart_disease:
         heart_disease = 1
+    else:
+        heart_disease = 0
 
     ever_married_mapper = {
         0: [1, 0],
         1: [0, 1]
     }
     ever_married = request.args.get("ever_married") or 0
-    if ever_married == "1":
+    if ever_married:
         ever_married = 1
+    else:
+        ever_married = 0
 
+    # Create a list of the user's given features
+    # We one-hot-encoded the categorical columns,
+    # so we must use a mapper to pass the user's single input
+    # to each relevant column
     features = [[age,
                  average_glucose_level,
                  bmi,
@@ -77,23 +89,24 @@ def predict():
                  ever_married_mapper[ever_married][0],
                  ever_married_mapper[ever_married][1]]]
 
+    # Scale features
     scaled_features = standard_scaler.transform(features)
 
+    # Make a prediction based on the user's input
     prediction = classifier.predict(scaled_features)
-    # prediction = classifier.predict(features)
+    # Determine prediction probability
     prediction_probability = classifier.predict_proba(scaled_features)
-    # prediction_probability = classifier.predict_proba(features)
 
-    print(100*"#")
-    print(features)
-    # print(features.shape)
-    # print(scaled_features.shape)
-    print(100*"#")
+    # print(100*"#")
+    # print(features)
+    # print(100*"#")
 
-    # return jsonify(features)
-    return jsonify([{"stroke_prediction": prediction.tolist(),
+    # Return a JSON giving the prediction and probability thereof
+    return jsonify({"stroke_prediction": prediction.tolist(),
                     "stroke_prediction_probability": prediction_probability.tolist(),
-                    "features": features}])
+                    "features": features})
 
+# Run Flask app
 if __name__ == "__main__":
     app.run(debug=True)
+
