@@ -1,8 +1,6 @@
 # UNCC Data Analytics Boot Camp Project 3- Machine Learning
 ### Are you at risk of having a stroke?
 ##### Source for the data used in the project: https://www.kaggle.com/asaumya/healthcare-data#train_2v.csv
-======
-
 
 In this project we examine 43,400 rows of data pertaining to individuals, in order to build a machine learning model to predict whether someone is at risk of having a stroke.  The data in each includes numerical factors, such as age and average glucose levels, and categorical factors, such as has heart disease (yes or no), work type, and smoking status.  This is not an exhaustive list.  We use this data to determine which factors contribute to having a stroke, and among those which hold the most weight.
 
