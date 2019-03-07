@@ -1,9 +1,6 @@
 # UNCC Data Analytics Boot Camp Project 3- Machine Learning
-
 ### Are you at risk of having a stroke?
-
 ##### Source for the data used in the project: https://www.kaggle.com/asaumya/healthcare-data#train_2v.csv
-
 ======
 
 
