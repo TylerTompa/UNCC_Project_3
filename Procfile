@@ -1,1 +1,1 @@
-web: gunicorn stroke-predictor
+web: gunicorn stroke-predictor:app
